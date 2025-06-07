@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PrivacyText - Emoji Encryption</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #1a1a1a;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    }
+    h1 {
+      color: #00ffc3;
+      text-shadow: 0 0 10px #00ffc3, 0 0 20px #00ffc3;
+      text-align: center;
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #00ffc3;
+      text-shadow: 0 0 5px #00ffc3;
+      text-align: center;
+      font-size: 28px;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+    h3 {
+      color: #00ffc3;
+      text-shadow: 0 0 3px #00ffc3;
+      font-size: 20px;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background-color: #2a2a2a;
+      color: #fff;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      background: #00ffc3;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 5px 10px 0;
+    }
+    button:hover {
+      background: #00e6b2;
+    }
+    .output {
+      margin-top: 15px;
+      font-size: 18px;
+      word-wrap: break-word;
+      background: #2b2b2b;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
+    }
+    .copy-btn {
+      background: #444;
+      color: white;
+      margin-left: 10px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 PrivacyText</h1>
+    <h2>Emoji-Based Encryption Tool</h2>
+
+    <h3>Encrypt Message</h3>
+    <textarea id="message" placeholder="Enter your message"></textarea>
+    <input type="password" id="password" placeholder="Enter encryption password" />
+    <button onclick="encrypt()">Encrypt to Emoji</button>
+    <button class="copy-btn" onclick="copyText('encrypted')">Copy Encrypted</button>
+    <div class="output" id="encrypted"></div>
+
+    <hr style="margin: 40px 0; border-color: #444;" />
+
+    <h3>Decrypt Emoji</h3>
+    <textarea id="emojiInput" placeholder="Enter emoji message"></textarea>
+    <input type="password" id="decryptPassword" placeholder="Enter decryption password" />
+    <button onclick="decrypt()">Decrypt Message</button>
+    <button class="copy-btn" onclick="copyText('decrypted')">Copy Decrypted</button>
+    <div class="output" id="decrypted"></div>
+  </div>
+
+  <div class="footer">
+    Made by Mohit Pathak • All rights reserved • © 2025 PrivacyText
+  </div>
+
+  <script>
+    const base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    const emojiMap = [
+      "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊",
+      "😋", "😎", "😍", "😘", "🥰", "😗", "😙", "😚", "🙂", "🤗",
+      "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥",
+      "😮", "🤐", "😯", "😪", "😫", "😴", "😌", "😛", "😜", "😝",
+      "🤤", "😒", "😓", "😔", "😕", "🙃", "🤑", "😲", "☹️", "🙁",
+      "😖", "😞", "😟", "😤", "😢", "😭", "😦", "😧", "😨", "😩",
+      "🤯", "😬", "😰", "😱", "🥵", "🥶", "😳", "🤪", "😵", "😡",
+      "😠", "🤬", "😷", "🤒", "🤕", "🤢"
+    ];
+
+    const charToEmoji = {};
+    const emojiToChar = {};
+
+    for (let i = 0; i < base64Chars.length && i < emojiMap.length; i++) {
+      charToEmoji[base64Chars[i]] = emojiMap[i];
+      emojiToChar[emojiMap[i]] = base64Chars[i];
+    }
+
+    function encrypt() {
+      const msg = document.getElementById('message').value.trim();
+      const pass = document.getElementById('password').value;
+      if (!msg || !pass) return alert("Please enter both message and password.");
+
+      const base64 = btoa(msg + '||' + pass);
+      let emojiStr = '';
+      for (let ch of base64) {
+        emojiStr += charToEmoji[ch] || '';
+      }
+      document.getElementById('encrypted').textContent = emojiStr;
+    }
+
+    function decrypt() {
+      const emojiStr = document.getElementById('emojiInput').value.trim();
+      const pass = document.getElementById('decryptPassword').value;
+      if (!emojiStr || !pass) return alert("Please enter both emoji code and password.");
+
+      let base64 = '';
+      for (let emoji of [...emojiStr]) {
+        base64 += emojiToChar[emoji] || '';
+      }
+
+      try {
+        const decoded = atob(base64);
+        const [text, passwordMatch] = decoded.split('||');
+        if (passwordMatch !== pass) return document.getElementById('decrypted').textContent = '❌ Incorrect password';
+        document.getElementById('decrypted').textContent = text;
+      } catch (e) {
+        document.getElementById('decrypted').textContent = '❌ Error decoding message';
+      }
+    }
+
+    function copyText(id) {
+      const text = document.getElementById(id).textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
+    }
+  </script>
+</body>
+</html>
